@@ -1,15 +1,21 @@
-# Assignment_1
+---
+title: "Assignment_1"
+author: "Roland Ferrao"
+date: "November 15, 2015"
+output: html_document
+---
 
-library(knitr)
+```{r}
+library(knitr)  
 library(ggplot2)
-library(scales)
 library(Hmisc)
 library(dplyr)
 library(lubridate)
 library(lattice)
+```
 
-# *******************
-# Stage 1: Loading and preprocessing the data
+### Stage1: Loading and preprocessing stage
+```{r}
 if (!file.exists("data")) {dir.create("data")}
 
 fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
@@ -22,10 +28,11 @@ dataset <- read.csv(unz("./data/activity.zip", "activity.csv"))
 
 dim(dataset) # 17,568 * 3
 colnames(dataset) #steps date interval
-str(datasets) # int, fact, int
+str(dataset) # int, fact, int
+```
 
-# *******************
-# Stage 2: What is the mean total number of steps taken per day
+### Stage2: What is the mean total number of steps taken per day?
+```{r}
 steps_by_day <- tapply(dataset$steps, list(dataset$date), FUN = sum) 
 
 hist(steps_by_day, 
@@ -38,9 +45,11 @@ hist(steps_by_day,
 # Mean and median steps by day
 steps_by_day_mean <- mean(steps_by_day, na.rm = TRUE) # 10,766
 steps_by_day_median <- median(steps_by_day, na.rm = TRUE) # 10,765
+```
 
-# *******************
-# Stage 3: What is the average daily activity pattern
+
+### Stage3: What is the average daily acitivty pattern?
+```{r}
 avg_steps_per_block <-aggregate(data = dataset, 
 	                  steps~interval, 
 	                  FUN = "mean", 
@@ -52,9 +61,10 @@ ggplot(data = avg_steps_per_block, aes(x = interval, y = steps)) +
 
 max_interval <- avg_steps_per_block[avg_steps_per_block$steps==max(avg_steps_per_block$steps),]
 max_interval
+```
 
-# *******************
-# Stage 4: Inputting missing values
+### Stage4: Input missing values
+```{r}
 
 # Number of missing values
 number_of_missing_values <- length(which(is.na(dataset$steps))) # 2,304
@@ -80,9 +90,10 @@ ggplot(steps_by_day_new_dataset, aes(date, steps)) +
 
 steps_by_day_new_dataset_mean <- mean(steps_by_day_new_dataset$steps) # 10,785
 steps_by_day_new_dataset_median <- median(steps_by_day_new_dataset$steps) # 10,909
+```
 
-# *******************
-# Stage 5: Are there differences in activity patterns between weekdays and weekends?
+### Stage5: Are there differences in activity patterns between weekdays and weekends?
+```{r}
 new_dataset$Weekday<-wday(new_dataset$date, label = TRUE, abbr = FALSE)
 new_dataset <- new_dataset %>%
 mutate(day_of_week = ifelse(Weekday %in% c("Saturday", "Sunday"), "Weekend", "Weekday"))
@@ -97,4 +108,7 @@ avg_new_dataset <- aggregate(steps ~ interval +
 xyplot(avg_new_dataset$steps ~ avg_new_dataset$interval | avg_new_dataset$day_of_week, 
        layout = c(1, 2), type = "l", 
        xlab = "Interval", ylab = "Number of steps")
+```
+
+
 
